@@ -1,11 +1,30 @@
-<html>
+﻿<html>
 <head>
 	<title>Barre de progression</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<style>
+	FIELDSET {
+		float: left;
+		margin: 1em 0 2em;
+		border: 2px solid #000;
+		}
+	CODE, PRE {
+		background: #000;
+		color: #FFF;
+		font: bold 1em Courier;
+		padding: .25em .5em;
+		}
 	#eProgressBar {
+		float: left;
 		margin: 0.5em;
-		width: 75%;
+		width: 50%;
+		}
+	.animForm {
+		float: left;
+		}
+	.description {
+		float: left;
+		padding: 2em;
 		}
 	</style>
 </head>
@@ -13,35 +32,102 @@
 
 <h1>Barre de progression</h1>
 
-<input type="button" onclick="oProgressBar.add(1)" value="Plus un bloc">
-<input type="button" onclick="oProgressBar.reset()" value="reset">
-<input type="button" onclick="oProgressBar.hide()" value="hide">
-<input type="button" onclick="oProgressBar.show()" value="show">
-<input type="checkbox" onclick="oProgressBar.bColor=eColor.checked" id="eColor" checked><label for="eColor">Couleur</label>
-<input type="checkbox" onclick="oProgressBar.bPercentage=ePercent.checked" id="ePercent" checked><label for="ePercent">Pourcentage</label>
-<input type="checkbox" onclick="switchAnimate()" id="eAnimate"><label for="eAnimate">Animer</label>
+<pre>var oProgressBar = new ProgressBar ( eProgressBar, nTotal )</pre>
+
+
+<fieldset>
+	<legend><code>oProgressBar</code></legend>
+	<table>
+		<tr>
+			<td>
+				<code>.add(1)</code>
+				<input type="button" onclick="oProgressBar.add(1)" value="Ajouter un bloc">
+			</td><td>Ajoute des bloques</td>
+		</tr>
+		<tr>
+			<td>
+				<code>.reset()</code>
+				<input type="button" onclick="oProgressBar.reset()" value="Initialiser">
+			</td><td>Initialise le compteur</td>
+		</tr>
+		<tr>
+			<td>
+				<code>.hide()</code>
+				<input type="button" onclick="oProgressBar.hide()" value="Masquer">
+			</td><td>Masque le widget.</td>
+		</tr>
+		<tr>
+			<td>
+				<code>.show()</code>
+				<input type="button" onclick="oProgressBar.show()" value="Afficher">
+			</td><td>Affiche le widget.</td>
+		</tr>
+		<tr>
+			<td>
+				<code><label for="eColor">.bColor</label></code>
+				<input type="checkbox" onclick="oProgressBar.bColor=eColor.checked" id="eColor" checked>
+			</td><td>Couleurs de rouge à verte utilisées.</td>
+		</tr>
+		<tr>
+			<td>
+				<code><label for="eColorInverted">.bInvertedColor</label></code>
+				<input type="checkbox" onclick="oProgressBar.bInvertedColor=eColorInverted.checked" id="eColorInverted">
+			</td><td>Couleurs de verte à rouge utilisées (inversion).</td>
+		</tr>
+		<tr>
+			<td>
+				<code><label for="ePercent">.bPercentage</label></code>
+				<input type="checkbox" onclick="oProgressBar.bPercentage=ePercent.checked" id="ePercent" checked>
+			</td><td>Afficher les pourcentages.</td>
+		</tr>
+		<tr>
+			<td><code>
+				<label for="eTotal">.setTotal</label>
+				(<input type="textbox" id="eTotal" onchange="oProgressBar.setTotal( eTotal.value )" value="5" size="3">)
+			</code></td><td>Nombre de bloc.</td>
+		</tr>
+	</table>
+</fieldset>
+
 
 <div id="eProgressBar"></div>
 
-<label for="eTotal">Nombre de bloc : </label><input type="textbox" id="eTotal" onchange="oProgressBar.setTotal( eTotal.value )" value="25" size="3">
+<ul class="animForm">
+	<li><input type="checkbox" onclick="switchAnimate()" id="eAnimate"><label for="eAnimate">Animer. </label></li>
+	<li><label for="eTime">Temps: </label><input type="textbox" id="eTime" value="500" size="3"></li>
+</ul>
 
+<div class="description">
+	<dl>
+		<dt><b>De rouge à vert</b></dt>
+		<dd>Le widget se masque automatiquement à 100%.</dd>
+		<dd>Usage: <i>Affichage de la complétion d'une tâche.</i></dd>
+		<dt><b>De vert à rouge</b></dt>
+		<dd>Le widget reste affiché si il dépasse les 100%.</dd>
+		<dd>Usage: <i>Affichage du dépassement de limite autorisée.</i></dd>
+	</dl>
+<div>
 
 <script src="js/scripts.js"></script>
 <script>
-var nTotal = 25
+// Eléments HTML
 var eProgressBar = document.getElementById( 'eProgressBar' )
 var eColor = document.getElementById( 'eColor' )
+var eColorInverted = document.getElementById( 'eColorInverted' )
 var eTotal = document.getElementById( 'eTotal' )
 var ePercent = document.getElementById( 'ePercent' )
 var eAnimate = document.getElementById( 'eAnimate' )
+var eTime = document.getElementById( 'eTime' )
 
-
+// Barre de progression
 var oProgressBar = new ProgressBar ( eProgressBar )
 oProgressBar.bColor = eColor.checked
+oProgressBar.bInvertedColor=eColorInverted.checked
 oProgressBar.bPercentage = ePercent.checked
 oProgressBar.setTotal( eTotal.value )
 oProgressBar.reset()
 
+// Animation de la barre
 var nInterval
 var nTimeOut
 function switchAnimate (){
@@ -52,9 +138,15 @@ function switchAnimate (){
 	else
 		nInterval = setInterval( function(){
 			oProgressBar.add(1)
-			if( oProgressBar.nValue == oProgressBar.nTotal && ! nTimeOut )
-				nTimeOut = setTimeout( function(){ oProgressBar.reset(); nTimeOut = null }, 2000 )
-			}, 200 )
+			if( oProgressBar.nValue == oProgressBar.nTotal && ! nTimeOut ){
+				switchAnimate()
+				nTimeOut = setTimeout( function(){
+					oProgressBar.reset()
+					nTimeOut = null
+					switchAnimate()
+					}, 1000 )
+				}
+			}, eTime.value )
 	}
 if( eAnimate.checked ) switchAnimate()
 </script>
