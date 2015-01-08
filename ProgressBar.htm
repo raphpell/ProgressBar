@@ -1,0 +1,63 @@
+<html>
+<head>
+	<title>Barre de progression</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+	#eProgressBar {
+		margin: 0.5em;
+		width: 75%;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Barre de progression</h1>
+
+<input type="button" onclick="oProgressBar.add(1)" value="Plus un bloc">
+<input type="button" onclick="oProgressBar.reset()" value="reset">
+<input type="button" onclick="oProgressBar.hide()" value="hide">
+<input type="button" onclick="oProgressBar.show()" value="show">
+<input type="checkbox" onclick="oProgressBar.bColor=eColor.checked" id="eColor" checked><label for="eColor">Couleur</label>
+<input type="checkbox" onclick="oProgressBar.bPercentage=ePercent.checked" id="ePercent" checked><label for="ePercent">Pourcentage</label>
+<input type="checkbox" onclick="switchAnimate()" id="eAnimate"><label for="eAnimate">Animer</label>
+
+<div id="eProgressBar"></div>
+
+<label for="eTotal">Nombre de bloc : </label><input type="textbox" id="eTotal" onchange="oProgressBar.setTotal( eTotal.value )" value="25" size="3">
+
+
+<script src="js/scripts.js"></script>
+<script>
+var nTotal = 25
+var eProgressBar = document.getElementById( 'eProgressBar' )
+var eColor = document.getElementById( 'eColor' )
+var eTotal = document.getElementById( 'eTotal' )
+var ePercent = document.getElementById( 'ePercent' )
+var eAnimate = document.getElementById( 'eAnimate' )
+
+
+var oProgressBar = new ProgressBar ( eProgressBar )
+oProgressBar.bColor = eColor.checked
+oProgressBar.bPercentage = ePercent.checked
+oProgressBar.setTotal( eTotal.value )
+oProgressBar.reset()
+
+var nInterval
+var nTimeOut
+function switchAnimate (){
+	if( nInterval ){
+		clearInterval( nInterval )
+		nInterval = null
+		}
+	else
+		nInterval = setInterval( function(){
+			oProgressBar.add(1)
+			if( oProgressBar.nValue == oProgressBar.nTotal && ! nTimeOut )
+				nTimeOut = setTimeout( function(){ oProgressBar.reset(); nTimeOut = null }, 2000 )
+			}, 200 )
+	}
+if( eAnimate.checked ) switchAnimate()
+</script>
+
+</body>
+</html>
